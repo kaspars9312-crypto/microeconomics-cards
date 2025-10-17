@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microeconomics Flashcards – Chapters 1–11</title>
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background: #f4f7fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  h1 { margin: 20px 0 10px; color: #333; font-weight: 700; }
+  h2 { margin: 5px 0 20px; color: #555; text-align: center; font-weight: 600; }
+  .card-container {
+    perspective: 1000px;
+    width: 90%;
+    max-width: 600px;
+    height: 300px;
+  }
+  #card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    background: white;
+    cursor: pointer;
+  }
+  #card.flipped { transform: rotateY(180deg); }
+  .side {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+  }
+  #back { transform: rotateY(180deg); }
+  .controls {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #0077ff;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  button:hover { background: #005fcc; }
+  #progress {
+    margin-top: 15px;
+    font-weight: 500;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<h1>Microeconomics Flashcards</h1>
+<h2 id="chapter-title">Chapter 1 – Ten Principles of Economics</h2>
+
+<div class="card-container">
+  <div id="card" onclick="flipCard()">
+    <div id="front" class="side"></div>
+    <div id="back" class="side"></div>
+  </div>
+</div>
+
+<div id="progress"></div>
+
+<div class="controls">
+  <button onclick="prevCard()">⬅ Prev</button>
+  <button onclick="nextCard()">Next ➡</button>
+  <button onclick="markKnow()">✅ Know</button>
+  <button onclick="markDontKnow()">❌ Don’t Know</button>
+  <button onclick="repeatMistakes()">Repeat Mistakes 🔁</button>
+  <button onclick="restartChapter()">Restart Chapter 🔄</button>
+  <button onclick="switchChapter()">Switch Chapter 📘</button>
+  <button onclick="shuffleAll()">Shuffle All 🔀</button>
+</div>
+
+<script>
+const chapters = [
+  // 1
+  [
+    {front:"What does it mean that people face trade-offs?",back:"Every decision requires giving up something else. Efficiency vs. equity — you can’t maximize both perfectly."},
+    {front:"What is the real cost of something?",back:"It’s the opportunity cost — what you give up to get it."},
+    {front:"How do rational people make decisions?",back:"They think at the margin — comparing marginal benefits and marginal costs."},
+    {front:"How do incentives affect behavior?",back:"People respond to changes in costs or benefits. Good policies consider these responses."},
+    {front:"How can trade make everyone better off?",back:"Trade allows specialization and higher total output, benefiting all participants."},
+    {front:"Why are markets efficient?",back:"Prices act as signals — the 'invisible hand' coordinates production and consumption efficiently."},
+    {front:"When should governments intervene in markets?",back:"To correct market failures (like externalities or monopolies) or promote fairness."},
+    {front:"What determines a country’s standard of living?",back:"Productivity — the amount of goods and services produced per worker."},
+    {front:"What happens when too much money is printed?",back:"Inflation — prices rise when money supply grows faster than production."},
+    {front:"What is the short-run trade-off between inflation and unemployment?",back:"Lower unemployment can temporarily increase inflation (Phillips Curve)."}
+  ],
+  // 2
+  [
+    {front:"Why does trade increase total welfare?",back:"It allows specialization — people and nations produce what they do best and trade for the rest."},
+    {front:"What’s the difference between absolute and comparative advantage?",back:"Absolute = efficiency; comparative = lower opportunity cost — the true basis of trade."},
+    {front:"How do opportunity costs drive specialization?",back:"Each producer focuses on goods with the lowest opportunity cost, raising total production."},
+    {front:"What does the Production Possibility Frontier show?",back:"Trade-offs between two goods. Trade lets nations consume beyond their PPF."},
+    {front:"What is the principle of comparative advantage?",back:"Everyone gains by specializing in the good they produce at the lowest opportunity cost."},
+    {front:"How does trade create interdependence?",back:"Economies become connected — benefiting from exchange but sharing risks globally."}
+  ],
+  // 3
+  [
+    {front:"What does the demand curve show?",back:"The relationship between price and quantity demanded. Lower prices increase demand."},
+    {front:"What factors shift the demand curve?",back:"Income, prices of substitutes/complements, tastes, expectations, and number of buyers."},
+    {front:"What does the supply curve show?",back:"The relationship between price and quantity supplied. Higher prices increase supply."},
+    {front:"What factors shift the supply curve?",back:"Input prices, technology, expectations, and number of sellers."},
+    {front:"What is market equilibrium?",back:"Where quantity demanded equals quantity supplied — no pressure for price change."},
+    {front:"What happens if demand or supply shifts?",back:"New equilibrium forms — changing price and quantity depending on the shift direction."},
+    {front:"What role do prices play in markets?",back:"They signal where to allocate resources, guiding producers and consumers efficiently."}
+  ],
+  // 4
+  [
+    {front:"What is price elasticity of demand?",back:"It measures how much quantity demanded changes when price changes. Elastic >1, Inelastic <1."},
+    {front:"What factors affect elasticity of demand?",back:"Availability of substitutes, necessity vs. luxury, market definition, and time horizon."},
+    {front:"How does elasticity affect total revenue?",back:"Elastic demand: price ↑ → TR ↓; Inelastic: price ↑ → TR ↑."},
+    {front:"What is income elasticity of demand?",back:"Shows how demand changes with income. Positive for normal goods, negative for inferior goods."},
+    {front:"What is cross-price elasticity?",back:"Shows how demand for one good reacts to another's price change. Positive = substitutes; negative = complements."},
+    {front:"What is price elasticity of supply?",back:"It measures how much supply responds to price changes. Elastic if production adjusts easily."},
+    {front:"How is elasticity used in policy and business?",back:"It guides tax policy, pricing strategy, and subsidy effects."}
+  ],
+  // 5
+  [
+    {front:"What are price controls?",back:"Government-imposed limits on prices — like rent control or minimum wage — that can cause shortages or surpluses."},
+    {front:"What is a price ceiling?",back:"A legal maximum price (e.g., rent control). If set below equilibrium, it causes shortages and black markets."},
+    {front:"What is a price floor?",back:"A legal minimum price (e.g., minimum wage). If set above equilibrium, it causes surpluses like unemployment."},
+    {front:"How do taxes affect markets?",back:"They drive a wedge between buyer and seller prices, reducing quantity traded and creating deadweight loss."},
+    {front:"What determines who bears the tax burden?",back:"The side of the market (buyers or sellers) that is less elastic bears more of the burden."},
+    {front:"What are subsidies?",back:"Payments that encourage production or consumption but can lead to inefficiency if poorly targeted."},
+    {front:"What is consumer and producer surplus?",back:"Consumer surplus = what buyers are willing to pay minus what they pay. Producer surplus = price received minus cost."},
+    {front:"What is deadweight loss?",back:"Lost total surplus from trades that don’t happen due to taxes or controls — larger when elasticities are higher."},
+    {front:"When can government improve market outcomes?",back:"When markets fail, e.g., due to pollution or monopoly. Well-designed policies can enhance welfare."}
+  ],
+  // 6
+  [
+    {front:"What is utility in economics?",back:"Utility measures satisfaction from consuming goods. Marginal utility decreases with each extra unit."},
+    {front:"What is the budget constraint?",back:"It shows all affordable combinations of goods given income and prices."},
+    {front:"What are indifference curves?",back:"They show bundles that give equal satisfaction. They slope downward, are convex, and never cross."},
+    {front:"When is consumer equilibrium reached?",back:"When the budget line is tangent to the highest indifference curve. MRS = Px/Py."},
+    {front:"What are the income and substitution effects?",back:"Price changes cause substitution (toward cheaper goods) and income effects (change in real purchasing power)."},
+    {front:"How is the demand curve derived?",back:"From consumer choices at different prices — lower prices increase quantity demanded."},
+    {front:"What does behavioral economics add?",back:"It includes bounded rationality, loss aversion, and framing effects that influence real decisions."}
+  ],
+  // 7
+  [
+    {front:"What is the production function?",back:"It shows the relationship between inputs and output. Output rises but at a diminishing rate."},
+    {front:"What is marginal product?",back:"The additional output from using one more unit of input."},
+    {front:"What is diminishing marginal product?",back:"As input use increases, the marginal product eventually declines."},
+    {front:"What are fixed and variable costs?",back:"Fixed costs don’t change with output; variable costs rise as production increases."},
+    {front:"What are total, average, and marginal costs?",back:"Total = fixed + variable; average = total/output; marginal = change in total cost per unit increase in output."},
+    {front:"How do short-run and long-run costs differ?",back:"Short run: at least one input fixed. Long run: all inputs variable; firms can adjust scale."},
+    {front:"What is economies of scale?",back:"Average costs fall as production increases due to specialization or technology."}
+  ],
+  // 8
+  [
+    {front:"What defines a perfectly competitive market?",back:"Many buyers/sellers, identical products, free entry/exit — no one can influence price."},
+    {front:"How does a firm decide output in the short run?",back:"Produce where price = marginal cost, as long as price ≥ average variable cost."},
+    {front:"When should a firm shut down temporarily?",back:"If price < average variable cost — it can’t cover variable costs."},
+    {front:"When should a firm exit the market?",back:"If price < average total cost — it cannot cover all costs in the long run."},
+    {front:"What happens to profits in the long run?",back:"Free entry/exit drives profit to zero; firms earn normal profit."},
+    {front:"What is the supply curve of a competitive market?",back:"The sum of individual firms’ marginal cost curves above average variable cost."},
+    {front:"Why is perfect competition efficient?",back:"It maximizes total surplus — price equals marginal cost, so no deadweight loss."}
+  ],
+  // 9
+  [
+    {front:"What is a monopoly?",back:"A market with a single seller of a product without close substitutes."},
+    {front:"Why do monopolies arise?",back:"They exist due to barriers to entry: ownership of key resources, government regulation, or natural monopoly."},
+    {front:"What is a natural monopoly?",back:"When a single firm can supply the entire market at lower cost than multiple firms due to economies of scale."},
+    {front:"How does a monopoly set price?",back:"It chooses quantity where MR=MC, then sets price on the demand curve above that point."},
+    {front:"What is price discrimination?",back:"Charging different prices to different customers for the same product based on willingness to pay."},
+    {front:"What are the inefficiencies of monopoly?",back:"It produces less than the socially efficient quantity and charges a higher price, creating deadweight loss."},
+    {front:"How can governments regulate monopolies?",back:"Through antitrust laws, price regulation, public ownership, or encouraging competition."}
+  ],
+  // 10
+  [
+    {front:"What is an oligopoly?",back:"A market with a few large firms that are interdependent and have market power."},
+    {front:"What is a cartel?",back:"A group of firms acting together to maximize joint profits, often illegal (like OPEC)."},
+    {front:"What is the Nash equilibrium?",back:"A situation where no player can benefit by changing strategy while others keep theirs unchanged."},
+    {front:"What is the prisoners’ dilemma?",back:"A game showing why cooperation can be difficult even when it benefits all participants."},
+    {front:"What strategies promote cooperation?",back:"Repeated games, punishment for defection, reputation effects, and communication."},
+    {front:"What is price leadership?",back:"When one dominant firm sets price and others follow it."},
+    {front:"What happens in duopoly models like Cournot or Bertrand?",back:"Cournot: firms choose quantities. Bertrand: firms choose prices, leading to competitive outcomes."}
+  ],
+  // 11
+  [
+    {front:"What defines monopolistic competition?",back:"Many firms selling similar but differentiated products, with free entry and exit."},
+    {front:"How is it different from monopoly and perfect competition?",back:"Like monopoly: downward-sloping demand; like perfect competition: free entry/exit."},
+    {front:"What happens in the short run?",back:"Firms may earn profits or losses as in a monopoly (P ≠ ATC)."},
+    {front:"What happens in the long run?",back:"Entry and exit drive economic profit to zero; firms produce where P = ATC > MC."},
+    {front:"What is excess capacity?",back:"Firms produce below the minimum ATC; markets have more firms than efficient scale would require."},
+    {front:"What is product differentiation?",back:"Creating distinct versions of a product to gain market power (branding, design, features)."},
+    {front:"What role does advertising play?",back:"It informs consumers, increases perceived differentiation, and can shift demand outward."}
+  ]
+];
+
+const chapterNames = [
+  "Ten Principles of Economics",
+  "Trade and Comparative Advantage",
+  "Supply, Demand, and Market Equilibrium",
+  "Elasticity",
+  "Government Policies and Market Efficiency",
+  "Consumer Choice",
+  "Production and Costs",
+  "Perfect Competition",
+  "Monopoly",
+  "Oligopoly and Game Theory",
+  "Monopolistic Competition"
+];
+
+let chapter = 0;
+let current = 0;
+let flashcards = [...chapters[0]];
+let mistakes = [];
+let reviewMode = false;
+
+const front = document.getElementById("front");
+const back = document.getElementById("back");
+const card = document.getElementById("card");
+const chapterTitle = document.getElementById("chapter-title");
+const progress = document.getElementById("progress");
+
+function renderCard(){
+  if(!flashcards.length){front.textContent="No cards.";back.textContent="";return;}
+  card.classList.remove("flipped");
+  front.textContent = flashcards[current].front;
+  back.textContent = flashcards[current].back;
+  progress.textContent = `Card ${current+1} of ${flashcards.length}`;
+}
+function flipCard(){card.classList.toggle("flipped");}
+function nextCard(){current=(current+1)%flashcards.length;renderCard();}
+function prevCard(){current=(current-1+flashcards.length)%flashcards.length;renderCard();}
+function markKnow(){nextCard();}
+function markDontKnow(){mistakes.push(flashcards[current]);nextCard();}
+function repeatMistakes(){
+  if(!mistakes.length){alert("No mistakes to review! ✅");return;}
+  flashcards=[...mistakes];
+  mistakes=[];
+  current=0;
+  reviewMode=true;
+  chapterTitle.textContent="Repeat Mistakes Mode 🔁";
+  renderCard();
+}
+function restartChapter(){
+  mistakes=[];
+  reviewMode=false;
+  flashcards=[...chapters[chapter]];
+  current=0;
+  chapterTitle.textContent=`Chapter ${chapter+1} – ${chapterNames[chapter]}`;
+  renderCard();
+}
+function switchChapter(){
+  mistakes=[];
+  reviewMode=false;
+  chapter=(chapter+1)%chapters.length;
+  flashcards=[...chapters[chapter]];
+  current=0;
+  chapterTitle.textContent=`Chapter ${chapter+1} – ${chapterNames[chapter]}`;
+  renderCard();
+}
+function shuffleAll(){
+  mistakes=[];
+  reviewMode=false;
+  flashcards=chapters.flat().sort(()=>Math.random()-0.5);
+  current=0;
+  chapterTitle.textContent="All Chapters – Mixed Mode 🔀";
+  renderCard();
+}
+
+renderCard();
+</script>
+</body>
+</html>
